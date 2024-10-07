@@ -1,6 +1,6 @@
-const clientId = process.env.SPOTIFY_CLIENT_ID;
-const clientSecret = process.env.SPOTIFY_CLIENT_SECRET;
-const redirectURL = process.env.SPOTIFY_REDIRECT_URL;
+const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
+const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
+const redirectURL = process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
 const scopes = [
   'user-read-private',
   'user-read-email',
@@ -9,6 +9,15 @@ const scopes = [
   'user-library-read',
   'user-follow-read',
 ].join('%20');
+
+// Debugging - Confirm the values are being set properly
+console.log("Client ID from .env:", process.env.REACT_APP_SPOTIFY_CLIENT_ID);
+console.log("Client Secret from .env:", process.env.REACT_APP_SPOTIFY_CLIENT_SECRET);
+console.log("Redirect URL from .env:", process.env.REACT_APP_SPOTIFY_REDIRECT_URI);
+
+
+
+
 
 
 // Construct Spotify login url

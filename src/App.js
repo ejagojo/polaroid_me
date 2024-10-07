@@ -4,6 +4,7 @@ import LandingPage from './components/LandingPage';
 import { exchangeCodeForToken, fetchSpotifyUserProfile } from '../src/services/spotifyService';
 
 function App() {
+  // eslint-disable-next-line no-unused-vars
   const [user, setUser] = useState(null);
   const [token, setToken] = useState('');
   const navigate = useNavigate();
