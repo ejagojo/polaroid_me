@@ -1,3 +1,5 @@
+// spotifyService.js
+
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const clientSecret = process.env.REACT_APP_SPOTIFY_CLIENT_SECRET;
 const redirectURL = process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
@@ -10,68 +12,94 @@ const scopes = [
   'user-follow-read',
 ].join('%20');
 
-// Debugging - Confirm the values are being set properly
-console.log("Client ID from .env:", process.env.REACT_APP_SPOTIFY_CLIENT_ID);
-console.log("Client Secret from .env:", process.env.REACT_APP_SPOTIFY_CLIENT_SECRET);
-console.log("Redirect URL from .env:", process.env.REACT_APP_SPOTIFY_REDIRECT_URI);
-
-
-
-
-
-
-// Construct Spotify login url
+// Construct Spotify login URL
 export const getSpotifyLoginURL = () => {
-    return `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectURL}&scope=${scopes}`;
-}
+  return `https://accounts.spotify.com/authorize?client_id=${clientId}&response_type=code&redirect_uri=${redirectURL}&scope=${scopes}`;
+};
 
+// Exchange authorization code for an access token
 export const exchangeCodeForToken = async (code) => {
-    const authString = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
-    const response = await fetch('https://accounts.spotify.com/api/token', {
-        method: 'POST',
-        headers: {
-        'Authorization': `Basic ${authString}`,
-        'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: new URLSearchParams({
-            code,
-            redirect_uri: redirectURL,
-            grant_type: 'authorization_code',
-        }).toString(),
-    });
-
-    if (response.ok) {
-        const data = await response.json();
-        localStorage.setItem('access_token', data.access_token);
-        localStorage.setItem('refresh_token', data.refresh_token);
-        return data;
-    } else {
-        throw new Error('Failed to retrieve access token')
-    }
-};
-
-export const fetchSpotifyUserProfile = async (accessToken) => {
-    const response = await fetch('https://api.spotify.com/v1/me', {
-        headers: {
-        'Authorization': `Bearer ${accessToken}`,
-        },
-    });
-
-    if (response.ok) {
-        const profileData = await response.json();
-        return profileData;
-    } else {
-        throw new Error('Failed to fech user profile');
-    }
-
-};
-
-export const refreshToken = async (refreshToken) => {
-  const authString = Buffer.from(`${clientId}:${clientSecret}`).toString('base64');
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
     headers: {
-      'Authorization': `Basic ${authString}`,
+      'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams({
+      code,
+      redirect_uri: redirectURL,
+      grant_type: 'authorization_code',
+    }).toString(),
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+    return data;
+  } else {
+    throw new Error('Failed to retrieve access token');
+  }
+};
+
+// Fetch the current user's Spotify profile
+export const fetchSpotifyUserProfile = async (accessToken) => {
+  const response = await fetch('https://api.spotify.com/v1/me', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  if (response.ok) {
+    return response.json();
+  } else {
+    throw new Error('Failed to fetch user profile');
+  }
+};
+
+// Fetch the user's top tracks with detailed logging
+export const fetchUserTopTracks = async (accessToken) => {
+  const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+
+  if (response.ok) {
+    const data = await response.json();
+
+    // Debugging: Log the entire raw data for the first 5 tracks
+    console.log("Full raw data for top 5 tracks:");
+
+    data.items.slice(0, 5).forEach((track, index) => {
+      console.log(`Raw Data for Track #${index + 1}:`, track);
+      console.log('--------------------------------');
+    });
+
+    return data;
+  } else {
+    throw new Error('Failed to fetch top tracks');
+  }
+};
+
+// Fetch the user's playlists
+export const fetchUserPlaylists = async (accessToken) => {
+  const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+    headers: {
+      'Authorization': `Bearer ${accessToken}`,
+    },
+  });
+  if (response.ok) {
+    return response.json();
+  } else {
+    throw new Error('Failed to fetch playlists');
+  }
+};
+
+// Refresh access token using the refresh token
+export const refreshToken = async (refreshToken) => {
+  const response = await fetch('https://accounts.spotify.com/api/token', {
+    method: 'POST',
+    headers: {
+      'Authorization': `Basic ${btoa(`${clientId}:${clientSecret}`)}`,
       'Content-Type': 'application/x-www-form-urlencoded',
     },
     body: new URLSearchParams({
@@ -82,7 +110,6 @@ export const refreshToken = async (refreshToken) => {
 
   if (response.ok) {
     const data = await response.json();
-    localStorage.setItem('access_token', data.access_token);
     return data.access_token;
   } else {
     throw new Error('Failed to refresh access token');
