@@ -4,32 +4,29 @@ import {
   fetchUserTopTracks,
   fetchUserPlaylists,
 } from '../services/spotifyService';
+import Loader from './Loader'; // Enhanced loader component
 
 const Home = ({ token }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [topTracks, setTopTracks] = useState([]);
   const [playlists, setPlaylists] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (token) {
       // Fetch user profile data
       fetchSpotifyUserProfile(token)
         .then((profile) => setUserProfile(profile))
-        .catch((err) => console.error('Error fetching user profile:', err));
-
-      // Fetch user's top tracks
-      fetchUserTopTracks(token)
+        .then(() => fetchUserTopTracks(token))
         .then((tracks) => setTopTracks(tracks.items))
-        .catch((err) => console.error('Error fetching top tracks:', err));
-
-      // Fetch user's playlists
-      fetchUserPlaylists(token)
+        .then(() => fetchUserPlaylists(token))
         .then((playlists) => setPlaylists(playlists.items))
-        .catch((err) => console.error('Error fetching playlists:', err));
+        .catch((err) => console.error('Error fetching data:', err))
+        .finally(() => setLoading(false)); // Ensure loading state is reset
     }
   }, [token]);
 
-  if (!userProfile) return <div>Loading...</div>;
+  if (loading) return <Loader />;
 
   return (
     <div className="min-h-screen p-10 bg-black text-white">
