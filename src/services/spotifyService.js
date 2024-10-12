@@ -11,8 +11,8 @@ const scopes = [
   'user-read-recently-played',
 ].join(' '); // Use spaces between scopes
 
-console.log('Client ID:', clientId);
-console.log('Redirect URI:', redirectURL);
+// console.log('Client ID:', clientId);
+// console.log('Redirect URI:', redirectURL);
 
 // Helper function to generate a random string with allowed characters
 const generateRandomString = (length) => {
@@ -48,8 +48,8 @@ export const getSpotifyLoginURL = async () => {
   const codeVerifier = generateRandomString(128); // Length between 43 and 128
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
-  // Store the code_verifier in sessionStorage for later use
-  sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+  // Store the code_verifier in localStorage for later use
+  localStorage.setItem('pkce_code_verifier', codeVerifier);
 
 
   // Construct the Spotify login URL
@@ -66,7 +66,7 @@ export const getSpotifyLoginURL = async () => {
 
 // Exchange authorization code for an access token using PKCE
 export const exchangeCodeForToken = async (code) => {
-  const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+  const codeVerifier = localStorage.getItem('pkce_code_verifier');
   // console.log('Retrieved codeVerifier:', codeVerifier);
 
   if (!codeVerifier) {
