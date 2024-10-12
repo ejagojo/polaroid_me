@@ -5,6 +5,7 @@ import {
   fetchSpotifyUserProfile,
   fetchUserTopTracks,
   fetchUserPlaylists,
+  fetchUserTopArtists,
 } from '../services/spotifyService';
 import Loader from './Loader';
 import PolaroidCollage from './PolaroidCollage';
@@ -12,11 +13,12 @@ import PolaroidCollage from './PolaroidCollage';
 const Home = ({ token }) => {
   const [userProfile, setUserProfile] = useState(null);
   const [topTracks, setTopTracks] = useState([]);
+  const [topArtists, setTopArtists] = useState([]);
   const [playlists, setPlaylists] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [timeRange, setTimeRange] = useState('medium_term'); // Time range state
-  const [tracksLoading, setTracksLoading] = useState(false); // Loading state for tracks
-  const [showCollage, setShowCollage] = useState(false); // Controls the display of the collage
+  const [timeRange, setTimeRange] = useState('medium_term');
+  const [tracksLoading, setTracksLoading] = useState(false);
+  const [showCollage, setShowCollage] = useState(false);
 
   useEffect(() => {
     // Fetch user profile and playlists once
@@ -42,21 +44,35 @@ const Home = ({ token }) => {
   }, [token]);
 
   useEffect(() => {
-    // Fetch top tracks whenever timeRange changes
-    const fetchTracks = async () => {
+    // Fetch top tracks and top artists whenever timeRange changes
+    const fetchData = async () => {
       setTracksLoading(true);
       setShowCollage(false); // Hide collage when time range changes
+
       try {
-        const tracks = await fetchUserTopTracks(token, timeRange);
-        setTopTracks(tracks.items);
-      } catch (error) {
-        console.error('Error fetching top tracks:', error);
+        // Fetch top tracks
+        try {
+          const tracks = await fetchUserTopTracks(token, timeRange);
+          setTopTracks(tracks.items);
+        } catch (error) {
+          console.error('Error fetching top tracks:', error);
+          setTopTracks([]);
+        }
+
+        // Fetch top artists
+        try {
+          const artists = await fetchUserTopArtists(token, timeRange);
+          setTopArtists(artists.items);
+        } catch (error) {
+          console.error('Error fetching top artists:', error);
+          setTopArtists([]);
+        }
       } finally {
         setTracksLoading(false);
       }
     };
 
-    fetchTracks();
+    fetchData();
   }, [token, timeRange]);
 
   if (loading) {
@@ -103,110 +119,147 @@ const Home = ({ token }) => {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-black text-white">
-      {/* User Profile Section */}
-      {userProfile && (
-        <div className="mb-8">
-          <h1 className="text-3xl font-bold mb-2">
-            Welcome, {userProfile.display_name}!
-          </h1>
-          <p className="text-lg">Your Spotify Data Dashboard</p>
-        </div>
-      )}
+    <div className="min-h-screen p-4 bg-black text-white flex justify-center">
+      {/* Wrapper with white border */}
+      <div className="w-full max-w-6xl border-2 border-white p-4">
+        {/* User Profile Section */}
+        {userProfile && (
+          <div className="mb-8">
+            <h1 className="text-3xl font-bold mb-2">
+              Welcome, {userProfile.display_name}!
+            </h1>
+            <p className="text-lg">Your Spotify Data Dashboard</p>
+          </div>
+        )}
 
-      {/* Time Range Buttons */}
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold mb-4">Select Time Range:</h2>
-        <div className="flex flex-wrap space-x-2">
-          <button
-            onClick={() => handleTimeRangeChange('short_term')}
-            className={`px-4 py-2 mb-2 rounded-md ${
-              timeRange === 'short_term' ? 'bg-white text-black' : 'bg-gray-800 text-white'
-            } hover:bg-white hover:text-black transition`}
-          >
-            Past Month
-          </button>
-          <button
-            onClick={() => handleTimeRangeChange('medium_term')}
-            className={`px-4 py-2 mb-2 rounded-md ${
-              timeRange === 'medium_term' ? 'bg-white text-black' : 'bg-gray-800 text-white'
-            } hover:bg-white hover:text-black transition`}
-          >
-            Past 6 Months
-          </button>
-          <button
-            onClick={() => handleTimeRangeChange('long_term')}
-            className={`px-4 py-2 mb-2 rounded-md ${
-              timeRange === 'long_term' ? 'bg-white text-black' : 'bg-gray-800 text-white'
-            } hover:bg-white hover:text-black transition`}
-          >
-            All Time
-          </button>
+        {/* Time Range Buttons */}
+        <div className="mb-6">
+          <h2 className="text-2xl font-semibold mb-4">Select Time Range:</h2>
+          <div className="flex flex-wrap space-x-2">
+            <button
+              onClick={() => handleTimeRangeChange('short_term')}
+              className={`px-4 py-2 mb-2 rounded-md ${
+                timeRange === 'short_term' ? 'bg-white text-black' : 'bg-gray-800 text-white'
+              } hover:bg-white hover:text-black transition`}
+            >
+              Past Month
+            </button>
+            <button
+              onClick={() => handleTimeRangeChange('medium_term')}
+              className={`px-4 py-2 mb-2 rounded-md ${
+                timeRange === 'medium_term' ? 'bg-white text-black' : 'bg-gray-800 text-white'
+              } hover:bg-white hover:text-black transition`}
+            >
+              Past 6 Months
+            </button>
+            <button
+              onClick={() => handleTimeRangeChange('long_term')}
+              className={`px-4 py-2 mb-2 rounded-md ${
+                timeRange === 'long_term' ? 'bg-white text-black' : 'bg-gray-800 text-white'
+              } hover:bg-white hover:text-black transition`}
+            >
+              All Time
+            </button>
+          </div>
+
+          {/* Generate Collage Button */}
+          <div className="mt-4">
+            <button
+              onClick={handleGenerateCollage}
+              className="px-6 py-3 bg-white text-black rounded-md hover:bg-gray-200 transition"
+            >
+              Generate Collage
+            </button>
+          </div>
         </div>
 
-        {/* Generate Collage Button */}
-        <div className="mt-4">
-          <button
-            onClick={handleGenerateCollage}
-            className="px-6 py-3 bg-white text-black rounded-md hover:bg-gray-200 transition"
-          >
-            Generate Collage
-          </button>
-        </div>
+        {/* Polaroid Collage Section */}
+        {showCollage && !tracksLoading && topTracks.length > 0 && (
+          <PolaroidCollage
+            tracks={topTracks}
+            timeRangeLabel={getTimeRangeLabel()}
+            userName={userProfile.display_name}
+            timeRangeDisplay={getTimeRangeDisplay()}
+            topArtists={topArtists}
+          />
+        )}
+
+        {/* Top Tracks Section */}
+        {tracksLoading ? (
+          <Loader />
+        ) : topTracks.length > 0 ? (
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold mb-4">Your Top Tracks</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {topTracks.map((track) => (
+                <div
+                  key={track.id}
+                  className="bg-gray-800 p-2 rounded hover:bg-gray-700 transition"
+                >
+                  <img
+                    src={track.album.images[0]?.url}
+                    alt={track.name}
+                    className="rounded mb-2 w-full h-32 object-cover"
+                  />
+                  <p
+                    className="font-semibold text-sm text-center leading-tight"
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {track.name}
+                  </p>
+                  <p
+                    className="text-xs text-center text-gray-300 leading-tight"
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {track.artists[0]?.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p>No top tracks available.</p>
+        )}
+
+        {/* Playlists Section */}
+        {playlists.length > 0 && (
+          <div>
+            <h2 className="text-3xl font-bold mb-4">Your Playlists</h2>
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+              {playlists.map((playlist) => (
+                <div
+                  key={playlist.id}
+                  className="bg-gray-800 p-2 rounded hover:bg-gray-700 transition"
+                >
+                  <img
+                    src={playlist.images[0]?.url}
+                    alt={playlist.name}
+                    className="rounded mb-2 w-full h-32 object-cover"
+                  />
+                  <p
+                    className="font-semibold text-sm text-center leading-tight"
+                    style={{
+                      whiteSpace: 'nowrap',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                    }}
+                  >
+                    {playlist.name}
+                  </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
       </div>
-
-      {/* Polaroid Collage Section */}
-      {showCollage && !tracksLoading && topTracks.length > 0 && (
-        <PolaroidCollage
-          tracks={topTracks}
-          timeRangeLabel={getTimeRangeLabel()}
-          userName={userProfile.display_name}
-          timeRangeDisplay={getTimeRangeDisplay()}
-        />
-      )}
-
-      {/* Top Tracks Section */}
-      {tracksLoading ? (
-        <Loader />
-      ) : topTracks.length > 0 ? (
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold mb-4">Your Top Tracks</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {topTracks.map((track) => (
-              <div key={track.id} className="bg-gray-800 p-4 rounded">
-                <img
-                  src={track.album.images[0]?.url}
-                  alt={track.name}
-                  className="rounded mb-2"
-                />
-                <p className="font-semibold">{track.name}</p>
-                <p className="text-sm">{track.artists[0]?.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      ) : (
-        <p>No top tracks available.</p>
-      )}
-
-      {/* Playlists Section */}
-      {playlists.length > 0 && (
-        <div>
-          <h2 className="text-3xl font-bold mb-4">Your Playlists</h2>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-            {playlists.map((playlist) => (
-              <div key={playlist.id} className="bg-gray-800 p-4 rounded">
-                <img
-                  src={playlist.images[0]?.url}
-                  alt={playlist.name}
-                  className="rounded mb-2"
-                />
-                <p className="font-semibold">{playlist.name}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
     </div>
   );
 };

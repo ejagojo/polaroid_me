@@ -8,6 +8,7 @@ const scopes = [
   'user-top-read',
   'user-library-read',
   'user-follow-read',
+  'user-read-recently-played',
 ].join(' '); // Use spaces between scopes
 
 // Helper function to generate a random string with allowed characters
@@ -47,9 +48,6 @@ export const getSpotifyLoginURL = async () => {
   // Store the code_verifier in sessionStorage for later use
   sessionStorage.setItem('pkce_code_verifier', codeVerifier);
 
-  // Log for debugging
-  console.log('Stored code_verifier:', codeVerifier);
-  console.log('Generated code_challenge:', codeChallenge);
 
   // Construct the Spotify login URL
   const url = `https://accounts.spotify.com/authorize?client_id=${encodeURIComponent(
@@ -66,19 +64,20 @@ export const getSpotifyLoginURL = async () => {
 // Exchange authorization code for an access token using PKCE
 export const exchangeCodeForToken = async (code) => {
   const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
-  console.log('Retrieved codeVerifier:', codeVerifier);
+  // console.log('Retrieved codeVerifier:', codeVerifier);
 
   if (!codeVerifier) {
     throw new Error('Code verifier not found in sessionStorage');
   }
 
+  console.log("You guys have a nice day!")
   // Log request parameters
-  console.log('Exchanging code for token with the following parameters:');
-  console.log('client_id:', clientId);
-  console.log('grant_type: authorization_code');
-  console.log('code:', code);
-  console.log('redirect_uri:', redirectURL);
-  console.log('code_verifier:', codeVerifier);
+  // console.log('Exchanging code for token with the following parameters:');
+  // console.log('client_id:', clientId);
+  // console.log('grant_type: authorization_code');
+  // console.log('code:', code);
+  // console.log('redirect_uri:', redirectURL);
+  // console.log('code_verifier:', codeVerifier);
 
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -198,4 +197,34 @@ export const fetchUserPlaylists = async (accessToken) => {
   } else {
     throw new Error('Failed to fetch playlists');
   }
+};
+
+export const fetchUserTopArtists = async (token, timeRange = 'medium_term') => {
+  const response = await fetch(
+    `https://api.spotify.com/v1/me/top/artists?limit=5&time_range=${timeRange}`,
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!response.ok) {
+    throw new Error('Failed to fetch top artists');
+  }
+  return response.json();
+};
+
+export const fetchUserRecentlyPlayed = async (token) => {
+  const response = await fetch(
+    'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!response.ok) {
+    throw new Error('Failed to fetch recently played tracks');
+  }
+  return response.json();
 };
