@@ -168,12 +168,15 @@ export const fetchSpotifyUserProfile = async (accessToken) => {
 };
 
 // Fetch the user's top tracks
-export const fetchUserTopTracks = async (accessToken) => {
-  const response = await fetch('https://api.spotify.com/v1/me/top/tracks', {
-    headers: {
-      'Authorization': `Bearer ${accessToken}`,
-    },
-  });
+export const fetchUserTopTracks = async (accessToken, timeRange = 'medium_term') => {
+  const response = await fetch(
+    `https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=50`,
+    {
+      headers: {
+        'Authorization': `Bearer ${accessToken}`,
+      },
+    }
+  );
 
   if (response.ok) {
     return response.json();
