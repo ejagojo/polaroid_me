@@ -43,37 +43,30 @@ const Home = ({ token }) => {
     fetchInitialData();
   }, [token]);
 
-  useEffect(() => {
-    // Fetch top tracks and top artists whenever timeRange changes
-    const fetchData = async () => {
-      setTracksLoading(true);
-      setShowCollage(false); // Hide collage when time range changes
+useEffect(() => {
+  // Fetch top tracks and top artists whenever timeRange changes
+  const fetchData = async () => {
+    setTracksLoading(true);
+    setShowCollage(false); // Hide collage when time range changes
 
-      try {
-        // Fetch top tracks
-        try {
-          const tracks = await fetchUserTopTracks(token, timeRange);
-          setTopTracks(tracks.items);
-        } catch (error) {
-          console.error('Error fetching top tracks:', error);
-          setTopTracks([]);
-        }
+    try {
+      // Fetch top tracks
+      const tracks = await fetchUserTopTracks(token, timeRange);
+      setTopTracks(tracks.items);
 
-        // Fetch top artists
-        try {
-          const artists = await fetchUserTopArtists(token, timeRange);
-          setTopArtists(artists.items);
-        } catch (error) {
-          console.error('Error fetching top artists:', error);
-          setTopArtists([]);
-        }
-      } finally {
-        setTracksLoading(false);
-      }
-    };
+      // Fetch top artists
+      const artists = await fetchUserTopArtists(token, timeRange);
+      setTopArtists(artists.items);
+    } catch (error) {
+      console.error('Error fetching data:', error);
+      // Optionally, display an error message to the user
+    } finally {
+      setTracksLoading(false);
+    }
+  };
 
-    fetchData();
-  }, [token, timeRange]);
+  fetchData();
+}, [token, timeRange]);
 
   if (loading) {
     return <Loader />;

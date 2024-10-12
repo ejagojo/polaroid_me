@@ -5,7 +5,7 @@ import html2canvas from "html2canvas";
 
 /**
  * PolaroidCollage Component
- * Displays a responsive polaroid-style collage of top tracks and user statistics.
+ * Displays a polaroid-style collage of top tracks and user statistics.
  *
  * Props:
  * - tracks: Array of track objects.
@@ -13,7 +13,6 @@ import html2canvas from "html2canvas";
  * - userName: The display name of the user.
  * - timeRangeDisplay: A user-friendly string for the time range (e.g., "Past Month").
  * - topArtists: Array of top artist objects.
- * - totalMinutes: Number representing total minutes listened.
  */
 const PolaroidCollage = ({
   tracks,
@@ -21,7 +20,6 @@ const PolaroidCollage = ({
   userName,
   timeRangeDisplay,
   topArtists,
-  // Removed totalMinutes as we'll address it in Issue 2
 }) => {
   const collageRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
@@ -44,10 +42,11 @@ const PolaroidCollage = ({
         // Capture the collage with higher resolution
         const canvas = await html2canvas(collageRef.current, {
           useCORS: true,
-          scale: 2,
+          scale: 3, // Increase scale to improve resolution
           scrollY: -window.scrollY,
-          windowWidth: collageRef.current.scrollWidth,
-          windowHeight: collageRef.current.scrollHeight,
+          // Set canvas dimensions to desired output size
+          width: collageRef.current.clientWidth * 3,
+          height: collageRef.current.clientHeight * 3,
         });
 
         const dataURL = canvas.toDataURL("image/png");
@@ -77,12 +76,13 @@ const PolaroidCollage = ({
           className="relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden"
           style={{
             width: "100%",
-            maxWidth: "360px",
+            maxWidth: "360px", // Adjust max width for mobile friendliness
             aspectRatio: "9 / 16",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             padding: "16px",
+            boxSizing: "border-box",
           }}
         >
           {/* Background Enhancement */}
@@ -93,7 +93,7 @@ const PolaroidCollage = ({
 
           {/* Collage Title */}
           <div className="w-full text-center mb-2 z-10">
-            <h2 className="text-l font-bold text-black">
+            <h2 className="text-xl font-bold text-black">
               Top 10 - {userName} - {timeRangeDisplay}
             </h2>
           </div>
@@ -103,16 +103,20 @@ const PolaroidCollage = ({
 
           {/* User Statistics */}
           <div className="w-full text-center mb-4 z-10">
-            {/* Removed Total Minutes Listened as per Issue 2 */}
-            <p className="text-xs text-black">
-              <strong>Favorite Artist:</strong> {topArtists[0]?.name || "N/A"}
+            <p className="text-sm text-black">
+              <strong>Favorite Artist:</strong>{" "}
+              {topArtists && topArtists.length > 0
+                ? topArtists[0].name
+                : "Not enough data"}
             </p>
-            <p className="text-xs text-black">
+            <p className="text-sm text-black">
               <strong>Top Genres:</strong>{" "}
-              {topArtists
-                .flatMap((artist) => artist.genres)
-                .slice(0, 3)
-                .join(", ") || "N/A"}
+              {topArtists && topArtists.length > 0
+                ? topArtists
+                    .flatMap((artist) => artist.genres)
+                    .slice(0, 3)
+                    .join(", ") || "N/A"
+                : "Not enough data"}
             </p>
           </div>
 
@@ -121,7 +125,7 @@ const PolaroidCollage = ({
             className="w-full flex-grow flex flex-wrap justify-center items-start z-10"
             style={{ paddingBottom: "40px" }}
           >
-            {tracks.slice(0, 10).map((track, index) => {
+            {tracks.slice(0, 10).map((track) => {
               // Random rotation between -5 and 5 degrees
               const rotation = Math.floor(Math.random() * 10) - 5;
               return (
