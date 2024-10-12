@@ -11,6 +11,9 @@ const scopes = [
   'user-read-recently-played',
 ].join(' '); // Use spaces between scopes
 
+console.log('Client ID:', clientId);
+console.log('Redirect URI:', redirectURL);
+
 // Helper function to generate a random string with allowed characters
 const generateRandomString = (length) => {
   const allowedChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789-._~';
