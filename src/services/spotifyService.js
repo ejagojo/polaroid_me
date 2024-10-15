@@ -172,7 +172,7 @@ export const fetchSpotifyUserProfile = async (accessToken) => {
 // Fetch the user's top tracks
 export const fetchUserTopTracks = async (accessToken, timeRange = 'medium_term') => {
   const response = await fetch(
-    `https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=50`,
+    `https://api.spotify.com/v1/me/top/tracks?time_range=${timeRange}&limit=10`,
     {
       headers: {
         'Authorization': `Bearer ${accessToken}`,
@@ -189,7 +189,7 @@ export const fetchUserTopTracks = async (accessToken, timeRange = 'medium_term')
 
 // Fetch the user's playlists
 export const fetchUserPlaylists = async (accessToken) => {
-  const response = await fetch('https://api.spotify.com/v1/me/playlists', {
+  const response = await fetch('https://api.spotify.com/v1/me/playlists?limit=10', {
     headers: {
       'Authorization': `Bearer ${accessToken}`,
     },
@@ -219,7 +219,7 @@ export const fetchUserTopArtists = async (token, timeRange = 'medium_term') => {
 
 export const fetchUserRecentlyPlayed = async (token) => {
   const response = await fetch(
-    'https://api.spotify.com/v1/me/player/recently-played?limit=50',
+    'https://api.spotify.com/v1/me/player/recently-played?limit=10',
     {
       headers: {
         Authorization: `Bearer ${token}`,

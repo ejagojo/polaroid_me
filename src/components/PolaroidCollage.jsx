@@ -1,5 +1,3 @@
-// /src/components/PolaroidCollage.jsx
-
 import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 
@@ -76,7 +74,7 @@ const PolaroidCollage = ({
           className="relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden"
           style={{
             width: "100%",
-            maxWidth: "360px", // Adjust max width for mobile friendliness
+            maxWidth: "360px", 
             aspectRatio: "9 / 16",
             display: "flex",
             flexDirection: "column",

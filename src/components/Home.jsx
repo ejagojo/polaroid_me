@@ -43,30 +43,30 @@ const Home = ({ token }) => {
     fetchInitialData();
   }, [token]);
 
-useEffect(() => {
-  // Fetch top tracks and top artists whenever timeRange changes
-  const fetchData = async () => {
-    setTracksLoading(true);
-    setShowCollage(false); // Hide collage when time range changes
+  useEffect(() => {
+    // Fetch top tracks and top artists whenever timeRange changes
+    const fetchData = async () => {
+      setTracksLoading(true);
+      setShowCollage(false); // Hide collage when time range changes
 
-    try {
-      // Fetch top tracks
-      const tracks = await fetchUserTopTracks(token, timeRange);
-      setTopTracks(tracks.items);
+      try {
+        // Fetch top tracks
+        const tracks = await fetchUserTopTracks(token, timeRange);
+        setTopTracks(tracks.items);
 
-      // Fetch top artists
-      const artists = await fetchUserTopArtists(token, timeRange);
-      setTopArtists(artists.items);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-      // Optionally, display an error message to the user
-    } finally {
-      setTracksLoading(false);
-    }
-  };
+        // Fetch top artists
+        const artists = await fetchUserTopArtists(token, timeRange);
+        setTopArtists(artists.items);
+      } catch (error) {
+        console.error('Error fetching data:', error);
+        // Optionally, display an error message to the user
+      } finally {
+        setTracksLoading(false);
+      }
+    };
 
-  fetchData();
-}, [token, timeRange]);
+    fetchData();
+  }, [token, timeRange]);
 
   if (loading) {
     return <Loader />;
@@ -121,7 +121,7 @@ useEffect(() => {
             <h1 className="text-3xl font-bold mb-2">
               Welcome, {userProfile.display_name}!
             </h1>
-            <p className="text-lg">Your Spotify Data Dashboard</p>
+            <p className="text-lg">Heres your music stuff bro</p>
           </div>
         )}
 
@@ -182,20 +182,27 @@ useEffect(() => {
           <Loader />
         ) : topTracks.length > 0 ? (
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-4">Your Top Tracks</h2>
+            <h2 className="text-3xl font-bold mb-4">Your Top Tracks - {getTimeRangeDisplay()}</h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
               {topTracks.map((track) => (
-                <div
-                  key={track.id}
-                  className="bg-gray-800 p-2 rounded hover:bg-gray-700 transition"
-                >
+              <div
+                key={track.id}
+                className="bg-white p-4 shadow-lg rounded-lg hover:shadow-xl transition-all duration-300 relative flex flex-col items-center"
+                style={{ width: '100%', aspectRatio: '3/4' }} // Slightly taller for a Polaroid look
+              >
+                {/* Image section with slightly less height to make space for text */}
+                <div className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2" style={{ width: '100%', height: '70%' }}>
                   <img
                     src={track.album.images[0]?.url}
                     alt={track.name}
-                    className="rounded mb-2 w-full h-32 object-cover"
+                    className="w-full h-full object-cover border-2 border-gray-300"
                   />
+                </div>
+
+                {/* Text section for track name and artist */}
+                <div className="absolute bottom-0 w-full bg-white text-center py-2 px-2">
                   <p
-                    className="font-semibold text-sm text-center leading-tight"
+                    className="font-semibold text-sm text-black leading-tight"
                     style={{
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -205,7 +212,7 @@ useEffect(() => {
                     {track.name}
                   </p>
                   <p
-                    className="text-xs text-center text-gray-300 leading-tight"
+                    className="text-xs text-gray-500 leading-tight"
                     style={{
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -215,6 +222,14 @@ useEffect(() => {
                     {track.artists[0]?.name}
                   </p>
                 </div>
+
+                {/* Optional: Add a shadow effect to mimic Polaroid */}
+                <div
+                  className="absolute inset-0 border-2 border-gray-300 rounded-lg pointer-events-none"
+                  style={{ boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)' }}
+                ></div>
+              </div>
+
               ))}
             </div>
           </div>
@@ -230,15 +245,19 @@ useEffect(() => {
               {playlists.map((playlist) => (
                 <div
                   key={playlist.id}
-                  className="bg-gray-800 p-2 rounded hover:bg-gray-700 transition"
+                  className="bg-white p-4 shadow-lg rounded-lg hover:shadow-xl transition-all duration-300 relative flex flex-col items-center"
+                  style={{ width: '100%', aspectRatio: '3/4' }}
                 >
-                  <img
-                    src={playlist.images[0]?.url}
-                    alt={playlist.name}
-                    className="rounded mb-2 w-full h-32 object-cover"
-                  />
+                  <div className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2" style={{ width: '100%', height: '70%' }}>
+                    <img
+                      src={playlist.images[0]?.url}
+                      alt={playlist.name}
+                      className="w-full h-full object-cover border-2 border-gray-300"
+                    />
+                  </div>
+                  <div className="absolute bottom-0 w-full bg-white text-center py-2 px-2">
                   <p
-                    className="font-semibold text-sm text-center leading-tight"
+                    className="font-semibold text-sm text-black leading-tight"
                     style={{
                       whiteSpace: 'nowrap',
                       overflow: 'hidden',
@@ -247,6 +266,11 @@ useEffect(() => {
                   >
                     {playlist.name}
                   </p>
+                  </div>
+                <div
+                  className="absolute inset-0 border-2 border-gray-300 rounded-lg pointer-events-none"
+                  style={{ boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)' }}
+                ></div>
                 </div>
               ))}
             </div>
