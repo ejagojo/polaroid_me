@@ -1,70 +1,35 @@
-# Getting Started with Create React App
+# Polaroid Me
+Polaroid Me is website designed for users who want to see what their music taste looks like as polaroids😤
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+Polaroid Me is heavily inspired by Receiptify, a popular website that converts your top Spotify tracks into a receipt-style list. Idea for this project of mine is creds to the creator of Receiptify!
 
-## Available Scripts
+Anyways feel free to visit my site -- https://polaroid-me.vercel.app/
 
-In the project directory, you can run:
+# Run the app locally
+Some pre-reqs is to have Nodejs downloaded - so please visit this site for a Nodejs downdload tutorial https://nodejs.org/en/learn/getting-started/how-to-install-nodejs
 
-### `npm start`
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+Once Node is installed - follow the instructions below
+Clone the repo 
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+```
+$ git clone https://github.com/ejagojo/polaroid_me.git
+```
 
-### `npm test`
+Once cloned, install the dependencies by running -
+```
+$ npm i
+```
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+### Obtaining your Spotify API user credentials
 
-### `npm run build`
+Please visit this website[https://developer.spotify.com/] to obtain your Client ID and to setup your Redirect uri
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+I used 
+```http://localhost:3000/callback``` - for the redirecturi
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
-
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
-
-### `npm run eject`
-
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
-
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
-
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
-
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
-
-## Learn More
-
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
-
-To learn React, check out the [React documentation](https://reactjs.org/).
-
-### Code Splitting
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
-
-### Analyzing the Bundle Size
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
-
-### Making a Progressive Web App
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
-
-### Advanced Configuration
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
-
-### Deployment
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
-
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Once those are setup, put them into your projects root folder in a .env file
+Now you can run the app by using the following command
+```
+$ npm start
+```
