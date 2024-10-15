@@ -1,17 +1,6 @@
 import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 
-/**
- * PolaroidCollage Component
- * Displays a polaroid-style collage of top tracks and user statistics.
- *
- * Props:
- * - tracks: Array of track objects.
- * - timeRangeLabel: String label for the time range (used in the image filename).
- * - userName: The display name of the user.
- * - timeRangeDisplay: A user-friendly string for the time range (e.g., "Past Month").
- * - topArtists: Array of top artist objects.
- */
 const PolaroidCollage = ({
   tracks,
   timeRangeLabel,
@@ -42,9 +31,9 @@ const PolaroidCollage = ({
           useCORS: true,
           scale: 3, // Increase scale to improve resolution
           scrollY: -window.scrollY,
-          // Set canvas dimensions to desired output size
-          width: collageRef.current.clientWidth * 3,
-          height: collageRef.current.clientHeight * 3,
+          // // Set canvas dimensions to desired output size
+          // width: collageRef.current.clientWidth * 3,
+          // height: collageRef.current.clientHeight * 3,
         });
 
         const dataURL = canvas.toDataURL("image/png");
@@ -73,15 +62,19 @@ const PolaroidCollage = ({
           ref={collageRef}
           className="relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden"
           style={{
-            width: "100%",
-            maxWidth: "360px", 
-            aspectRatio: "9 / 16",
+            width: "100vw",
+            height: "177.78vw", // 100vw * (16/9)
+            maxWidth: "360px",
+            maxHeight: "640px",
+            position: "relative",
+            overflow: "hidden",
             display: "flex",
             flexDirection: "column",
             alignItems: "center",
             padding: "16px",
             boxSizing: "border-box",
           }}
+
         >
           {/* Background Enhancement */}
           <div
