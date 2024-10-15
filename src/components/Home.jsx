@@ -189,7 +189,7 @@ const Home = ({ token }) => {
         {instructionsVisible && showCollage && (
           <div className="mt-6 bg-gray-900 p-4 rounded-md border border-gray-700 text-center">
             <p className="text-white text-lg font-semibold">
-              Do this bro:
+              Instructions:
             </p>
             <p className="text-white mt-2">
               1. Tap <strong>"View Full Screen"</strong> to see your collage.
