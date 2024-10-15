@@ -1,4 +1,6 @@
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState } from "react";
+import html2canvas from "html2canvas";
+import { saveAs } from "file-saver";
 
 const PolaroidCollage = ({
   tracks,
@@ -8,74 +10,49 @@ const PolaroidCollage = ({
   topArtists,
 }) => {
   const collageRef = useRef(null);
-  const [isFullscreen, setIsFullscreen] = useState(false);
-  const [showExitButton, setShowExitButton] = useState(true); // Control exit button visibility
+  const [isDownloading, setIsDownloading] = useState(false);
 
-  // Handle Fullscreen change
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      if (document.fullscreenElement) {
-        setIsFullscreen(true);
-        // Show the exit button initially
-        setShowExitButton(true);
-        // Hide the exit button after 3 seconds
-        setTimeout(() => setShowExitButton(false), 3000);
-      } else {
-        setIsFullscreen(false);
+  /**
+   * Handles the download of the collage image.
+   * Uses html2canvas to capture the collage at the exact size of the preview.
+   */
+  const handleDownload = async () => {
+    if (collageRef.current) {
+      try {
+        setIsDownloading(true);
+
+        // Capture the exact size of the collage preview
+        const canvas = await html2canvas(collageRef.current, {
+          useCORS: true,
+          scale: 2, // Slightly increase scale for sharper rendering
+          scrollY: -window.scrollY,
+          width: collageRef.current.offsetWidth,
+          height: collageRef.current.offsetHeight,
+        });
+
+        // Convert the canvas to Blob and use FileSaver to trigger download
+        canvas.toBlob((blob) => {
+          saveAs(blob, `polaroid_collage_${timeRangeLabel}.png`);
+        });
+      } catch (error) {
+        console.error("Error generating image:", error);
+        alert("An error occurred while generating the image.");
+      } finally {
+        setIsDownloading(false);
       }
-    };
-
-    // Listen for fullscreen change
-    document.addEventListener("fullscreenchange", handleFullscreenChange);
-
-    // Cleanup the event listener when the component is unmounted
-    return () => {
-      document.removeEventListener("fullscreenchange", handleFullscreenChange);
-    };
-  }, []);
-
-  // Toggle Fullscreen
-  const toggleFullScreen = () => {
-    if (!isFullscreen) {
-      if (collageRef.current.requestFullscreen) {
-        collageRef.current.requestFullscreen();
-      } else if (collageRef.current.webkitRequestFullscreen) {
-        collageRef.current.webkitRequestFullscreen(); // Safari
-      } else if (collageRef.current.msRequestFullscreen) {
-        collageRef.current.msRequestFullscreen(); // IE11
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen();
-      } else if (document.webkitExitFullscreen) {
-        document.webkitExitFullscreen(); // Safari
-      } else if (document.msExitFullscreen) {
-        document.msExitFullscreen(); // IE11
-      }
-    }
-  };
-
-  // Handle user tapping anywhere on the collage to show/hide the exit button
-  const handleUserTap = () => {
-    if (isFullscreen) {
-      setShowExitButton(true); // Show the button again when the user taps
-      // Hide it again after 3 seconds
-      setTimeout(() => setShowExitButton(false), 3000);
     }
   };
 
   return (
     <div className="mb-8">
       {/* Collage Container */}
-      <div className="relative w-full flex justify-center mb-4" onClick={handleUserTap}>
+      <div className="relative w-full flex justify-center mb-4">
         <div
           ref={collageRef}
-          className={`relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden ${
-            isFullscreen ? "fullscreen-mode" : ""
-          }`}
+          className="relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden"
           style={{
-            width: isFullscreen ? "100vw" : "100%",
-            height: isFullscreen ? "100vh" : "177.78vw", // Mobile-friendly aspect ratio
+            width: "100vw",
+            height: "177.78vw", // Aspect ratio for iPhone simulation (16:9)
             maxWidth: "360px",
             maxHeight: "640px",
             position: "relative",
@@ -124,7 +101,7 @@ const PolaroidCollage = ({
 
           {/* Polaroid Frames Container */}
           <div
-            className="w-full flex-grow flex flex-wrap justify-center items-start z-10"
+            className="w-full flex-grow flex flex-wrap justify-center items-start z-10 gap-4"
             style={{ paddingBottom: "40px" }}
           >
             {tracks.slice(0, 10).map((track) => {
@@ -132,56 +109,68 @@ const PolaroidCollage = ({
               return (
                 <div
                   key={track.id}
-                  className="relative m-1"
+                  className="relative flex-shrink-0 shadow-lg rounded-lg transition-all duration-300"
                   style={{
                     transform: `rotate(${rotation}deg)`,
-                    width: "45%",
-                    maxWidth: "100px",
+                    width: "100%", // Adjust to fill space in a responsive grid
+                    aspectRatio: "3 / 4", // Slightly taller for Polaroid effect
+                    maxWidth: "120px", // Ensure Polaroids stay within desired size
+                    position: "relative",
                   }}
                 >
                   {/* Polaroid Frame */}
                   <div
-                    className="bg-white shadow-md rounded-sm overflow-hidden flex flex-col"
-                    style={{ height: "150px" }}
+                    className="bg-white p-2 shadow-lg rounded-lg flex flex-col items-center"
+                    style={{ height: "100%" }}
                   >
                     {/* Album Art */}
-                    <div className="flex-grow">
+                    <div
+                      className="relative rounded overflow-hidden mb-2"
+                      style={{
+                        width: "100%",
+                        height: "70%",
+                      }}
+                    >
                       <img
                         src={track.album.images[0]?.url}
                         alt={`${track.name} by ${track.artists[0]?.name}`}
-                        className="w-full h-full object-cover"
-                        crossOrigin="anonymous"
+                        className="w-full h-full object-cover border-2 border-gray-300"
                       />
                     </div>
                     {/* Caption */}
                     <div
-                      className="p-1 download-font-size"
+                      className="absolute bottom-0 w-full bg-white text-center py-1 px-1"
                       style={{
                         height: "40px",
+                        whiteSpace: "nowrap",
                         overflow: "hidden",
+                        textOverflow: "ellipsis",
+                        padding: "4px",
                       }}
                     >
                       <p
-                        className="text-xs font-semibold text-black leading-tight"
+                        className="font-semibold text-xs text-black leading-tight"
                         style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          fontSize: "8px", // Smaller font size for the track name
                         }}
                       >
                         {track.name}
                       </p>
                       <p
-                        className="text-xs text-gray-800 leading-tight"
+                        className="text-xs text-gray-500 leading-tight"
                         style={{
-                          whiteSpace: "nowrap",
-                          overflow: "hidden",
-                          textOverflow: "ellipsis",
+                          fontSize: "7px", // Smaller font size for the artist name
                         }}
                       >
                         {track.artists[0]?.name}
                       </p>
                     </div>
+
+                    {/* Optional: Add a shadow effect to mimic Polaroid */}
+                    <div
+                      className="absolute inset-0 border-2 border-gray-300 rounded-lg pointer-events-none"
+                      style={{ boxShadow: "0 10px 15px rgba(0, 0, 0, 0.1)" }}
+                    ></div>
                   </div>
                 </div>
               );
@@ -192,30 +181,19 @@ const PolaroidCollage = ({
           <div className="absolute bottom-2 w-full text-center z-10">
             <p className="text-xs text-black">polaroid-me.vercel.app/</p>
           </div>
-
-          {/* Exit Fullscreen Button with Auto-Hide */}
-          {isFullscreen && showExitButton && (
-            <button
-              onClick={toggleFullScreen}
-              className="absolute top-2 right-2 z-20 bg-gray-700 text-white px-4 py-2 rounded-md"
-            >
-              Exit Full Screen
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Full-Screen Button */}
-      {!isFullscreen && (
-        <div className="flex justify-center">
-          <button
-            onClick={toggleFullScreen}
-            className="text-white bg-black border-2 border-gray-800 rounded-md px-6 py-3 hover:bg-gray-800 hover:text-white transition-all duration-200"
-          >
-            View Full Screen
-          </button>
-        </div>
-      )}
+      {/* Download Button */}
+      <div className="flex justify-center">
+        <button
+          onClick={handleDownload}
+          className="text-white bg-black border-2 border-gray-800 rounded-md px-6 py-3 hover:bg-gray-800 hover:text-white transition-all duration-200"
+          disabled={isDownloading}
+        >
+          {isDownloading ? "Downloading..." : "Download Collage"}
+        </button>
+      </div>
     </div>
   );
 };
