@@ -1,5 +1,3 @@
-// /src/components/Home.jsx
-
 import React, { useEffect, useState } from 'react';
 import {
   fetchSpotifyUserProfile,
@@ -19,6 +17,7 @@ const Home = ({ token }) => {
   const [timeRange, setTimeRange] = useState('medium_term');
   const [tracksLoading, setTracksLoading] = useState(false);
   const [showCollage, setShowCollage] = useState(false);
+  const [instructionsVisible, setInstructionsVisible] = useState(false); // Controls the visibility of the instructions
 
   useEffect(() => {
     // Fetch user profile and playlists once
@@ -81,6 +80,7 @@ const Home = ({ token }) => {
   // Function to handle collage generation
   const handleGenerateCollage = () => {
     setShowCollage(true);
+    setInstructionsVisible(false); // Hide instructions initially
   };
 
   // Function to get a label for the time range (used in filename)
@@ -111,6 +111,11 @@ const Home = ({ token }) => {
     }
   };
 
+  // Function to show instructions when collage is generated
+  const handleShowInstructions = () => {
+    setInstructionsVisible(true);
+  };
+
   return (
     <div className="min-h-screen p-4 bg-black text-white flex justify-center">
       {/* Wrapper with white border */}
@@ -121,7 +126,7 @@ const Home = ({ token }) => {
             <h1 className="text-3xl font-bold mb-2">
               Welcome, {userProfile.display_name}!
             </h1>
-            <p className="text-lg">Heres your music stuff bro</p>
+            <p className="text-lg">Here's your music stuff bro</p>
           </div>
         )}
 
@@ -158,7 +163,10 @@ const Home = ({ token }) => {
           {/* Generate Collage Button */}
           <div className="mt-4">
             <button
-              onClick={handleGenerateCollage}
+              onClick={() => {
+                handleGenerateCollage();
+                handleShowInstructions(); // Show instructions when collage is generated
+              }}
               className="px-6 py-3 bg-white text-black rounded-md hover:bg-gray-200 transition"
             >
               Generate Collage
@@ -175,6 +183,24 @@ const Home = ({ token }) => {
             timeRangeDisplay={getTimeRangeDisplay()}
             topArtists={topArtists}
           />
+        )}
+
+        {/* Instructions for Viewing and Screenshot */}
+        {instructionsVisible && showCollage && (
+          <div className="mt-6 bg-gray-900 p-4 rounded-md border border-gray-700 text-center">
+            <p className="text-white text-lg font-semibold">
+              Do this bro:
+            </p>
+            <p className="text-white mt-2">
+              1. Tap <strong>"View Full Screen"</strong> to see your collage.
+            </p>
+            <p className="text-white mt-1">
+              2. Take a screenshot of your collage while in full screen mode.
+            </p>
+            <p className="text-white mt-1">
+              3. Tap the screen to exit out of full screen.
+            </p>
+          </div>
         )}
 
         {/* Top Tracks Section */}

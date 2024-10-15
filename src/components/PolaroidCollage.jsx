@@ -1,5 +1,4 @@
-import React, { useRef, useState } from "react";
-import html2canvas from "html2canvas";
+import React, { useRef, useState, useEffect } from "react";
 
 const PolaroidCollage = ({
   tracks,
@@ -9,61 +8,74 @@ const PolaroidCollage = ({
   topArtists,
 }) => {
   const collageRef = useRef(null);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  const [showExitButton, setShowExitButton] = useState(true); // Control exit button visibility
 
-  /**
-   * Handles the download of the collage image.
-   * Uses html2canvas to capture the collage and triggers a download.
-   */
-  const handleDownload = async () => {
-    if (collageRef.current) {
-      try {
-        setIsDownloading(true);
-
-        // Scroll to the collage to ensure it's in view
-        collageRef.current.scrollIntoView({
-          behavior: "auto",
-          block: "center",
-        });
-
-        // Capture the collage with higher resolution
-        const canvas = await html2canvas(collageRef.current, {
-          useCORS: true,
-          scale: 3, // Increase scale to improve resolution
-          scrollY: -window.scrollY,
-          // // Set canvas dimensions to desired output size
-          // width: collageRef.current.clientWidth * 3,
-          // height: collageRef.current.clientHeight * 3,
-        });
-
-        const dataURL = canvas.toDataURL("image/png");
-
-        // Create a link to download the image
-        const link = document.createElement("a");
-        link.href = dataURL;
-        link.download = `polaroid_collage_${timeRangeLabel}.png`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-      } catch (error) {
-        console.error("Error generating image:", error);
-        alert("An error occurred while generating the image.");
-      } finally {
-        setIsDownloading(false);
+  // Handle Fullscreen change
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      if (document.fullscreenElement) {
+        setIsFullscreen(true);
+        // Show the exit button initially
+        setShowExitButton(true);
+        // Hide the exit button after 3 seconds
+        setTimeout(() => setShowExitButton(false), 3000);
+      } else {
+        setIsFullscreen(false);
       }
+    };
+
+    // Listen for fullscreen change
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+
+    // Cleanup the event listener when the component is unmounted
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
+  // Toggle Fullscreen
+  const toggleFullScreen = () => {
+    if (!isFullscreen) {
+      if (collageRef.current.requestFullscreen) {
+        collageRef.current.requestFullscreen();
+      } else if (collageRef.current.webkitRequestFullscreen) {
+        collageRef.current.webkitRequestFullscreen(); // Safari
+      } else if (collageRef.current.msRequestFullscreen) {
+        collageRef.current.msRequestFullscreen(); // IE11
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen();
+      } else if (document.webkitExitFullscreen) {
+        document.webkitExitFullscreen(); // Safari
+      } else if (document.msExitFullscreen) {
+        document.msExitFullscreen(); // IE11
+      }
+    }
+  };
+
+  // Handle user tapping anywhere on the collage to show/hide the exit button
+  const handleUserTap = () => {
+    if (isFullscreen) {
+      setShowExitButton(true); // Show the button again when the user taps
+      // Hide it again after 3 seconds
+      setTimeout(() => setShowExitButton(false), 3000);
     }
   };
 
   return (
     <div className="mb-8">
       {/* Collage Container */}
-      <div className="relative w-full flex justify-center mb-4">
+      <div className="relative w-full flex justify-center mb-4" onClick={handleUserTap}>
         <div
           ref={collageRef}
-          className="relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden"
+          className={`relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden ${
+            isFullscreen ? "fullscreen-mode" : ""
+          }`}
           style={{
-            width: "100vw",
-            height: "177.78vw", // 100vw * (16/9)
+            width: isFullscreen ? "100vw" : "100%",
+            height: isFullscreen ? "100vh" : "177.78vw", // Mobile-friendly aspect ratio
             maxWidth: "360px",
             maxHeight: "640px",
             position: "relative",
@@ -74,7 +86,6 @@ const PolaroidCollage = ({
             padding: "16px",
             boxSizing: "border-box",
           }}
-
         >
           {/* Background Enhancement */}
           <div
@@ -117,7 +128,6 @@ const PolaroidCollage = ({
             style={{ paddingBottom: "40px" }}
           >
             {tracks.slice(0, 10).map((track) => {
-              // Random rotation between -5 and 5 degrees
               const rotation = Math.floor(Math.random() * 10) - 5;
               return (
                 <div
@@ -132,7 +142,7 @@ const PolaroidCollage = ({
                   {/* Polaroid Frame */}
                   <div
                     className="bg-white shadow-md rounded-sm overflow-hidden flex flex-col"
-                    style={{ height: "150px" }} // Fixed height for the polaroid
+                    style={{ height: "150px" }}
                   >
                     {/* Album Art */}
                     <div className="flex-grow">
@@ -145,9 +155,9 @@ const PolaroidCollage = ({
                     </div>
                     {/* Caption */}
                     <div
-                      className="p-1"
+                      className="p-1 download-font-size"
                       style={{
-                        height: "40px", // Fixed height for caption
+                        height: "40px",
                         overflow: "hidden",
                       }}
                     >
@@ -182,19 +192,30 @@ const PolaroidCollage = ({
           <div className="absolute bottom-2 w-full text-center z-10">
             <p className="text-xs text-black">polaroid-me.vercel.app/</p>
           </div>
+
+          {/* Exit Fullscreen Button with Auto-Hide */}
+          {isFullscreen && showExitButton && (
+            <button
+              onClick={toggleFullScreen}
+              className="absolute top-2 right-2 z-20 bg-gray-700 text-white px-4 py-2 rounded-md"
+            >
+              Exit Full Screen
+            </button>
+          )}
         </div>
       </div>
 
-      {/* Download Button */}
-      <div className="flex justify-center">
-        <button
-          onClick={handleDownload}
-          className="text-white bg-black border-2 border-gray-800 rounded-md px-6 py-3 hover:bg-gray-800 hover:text-white transition-all duration-200"
-          disabled={isDownloading}
-        >
-          {isDownloading ? "Downloading..." : "Download Collage"}
-        </button>
-      </div>
+      {/* Full-Screen Button */}
+      {!isFullscreen && (
+        <div className="flex justify-center">
+          <button
+            onClick={toggleFullScreen}
+            className="text-white bg-black border-2 border-gray-800 rounded-md px-6 py-3 hover:bg-gray-800 hover:text-white transition-all duration-200"
+          >
+            View Full Screen
+          </button>
+        </div>
+      )}
     </div>
   );
 };
