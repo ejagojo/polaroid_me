@@ -48,6 +48,10 @@ export const getSpotifyLoginURL = async () => {
   const codeVerifier = generateRandomString(128); // Length between 43 and 128
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
+
+  console.log('Code Verifier:', codeVerifier);
+  console.log('Code Challenge:', codeChallenge);
+
   // Store the code_verifier in localStorage for later use
   localStorage.setItem('pkce_code_verifier', codeVerifier);
 
@@ -68,8 +72,11 @@ export const getSpotifyLoginURL = async () => {
 export const exchangeCodeForToken = async (code) => {
   const codeVerifier = localStorage.getItem('pkce_code_verifier');
   // console.log('Retrieved codeVerifier:', codeVerifier);
+  // console.log('Exchanging code:', code);
+  // console.log('Using codeVerifier:', codeVerifier)
 
   if (!codeVerifier) {
+    console.error('Code verifier not found!');
     throw new Error('Code verifier not found in sessionStorage');
   }
 
@@ -96,9 +103,12 @@ export const exchangeCodeForToken = async (code) => {
     }).toString(),
   });
 
+  console.log('Token exchange response status:', response.status);
+
   if (response.ok) {
     const data = await response.json();
     // Save the access and refresh tokens in localStorage
+    // console.log('Access token data:', data);
     localStorage.setItem('accessToken', data.access_token);
     localStorage.setItem('refreshToken', data.refresh_token);
     localStorage.setItem('tokenExpiration', Date.now() + data.expires_in * 1000);
