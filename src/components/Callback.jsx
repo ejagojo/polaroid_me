@@ -11,13 +11,19 @@ function Callback() {
   const hasExchangedCode = useRef(false); // Ref to prevent multiple exchanges
 
   useEffect(() => {
-    if (hasExchangedCode.current) return; // If already exchanged, do nothing
+    if (hasExchangedCode.current) {
+      console.log("Token exchange has already been done. Skipping...");
+      return;
+      }; // If already exchanged, do nothing
     hasExchangedCode.current = true; // Mark as exchanged
 
     const code = new URLSearchParams(location.search).get('code');
+    console.log("Authorization code found in URL:", code);
+
     if (code) {
       exchangeCodeForToken(code)
         .then(() => {
+          console.log("Token exchange successful, navigating to /home");
           // Remove code from URL to prevent reuse
           navigate('/home', { replace: true });
         })

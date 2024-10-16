@@ -11,8 +11,8 @@ const scopes = [
   'user-read-recently-played',
 ].join(' '); // Use spaces between scopes
 
-// console.log('Client ID:', clientId);
-// console.log('Redirect URI:', redirectURL);
+console.log('Client ID:', clientId);
+console.log('Redirect URI:', redirectURL);
 
 // Helper function to generate a random string with allowed characters
 const generateRandomString = (length) => {
@@ -65,15 +65,17 @@ export const getSpotifyLoginURL = async () => {
     scopes
   )}&code_challenge_method=S256&code_challenge=${encodeURIComponent(codeChallenge)}`;
 
+  console.log('Redirecting to Spotify Login URL:', url);
+
   return url;
 };
 
 // Exchange authorization code for an access token using PKCE
 export const exchangeCodeForToken = async (code) => {
   const codeVerifier = localStorage.getItem('pkce_code_verifier');
-  // console.log('Retrieved codeVerifier:', codeVerifier);
-  // console.log('Exchanging code:', code);
-  // console.log('Using codeVerifier:', codeVerifier)
+  console.log('Retrieved codeVerifier:', codeVerifier);
+  console.log('Exchanging code:', code);
+  console.log('Using codeVerifier:', codeVerifier)
 
   if (!codeVerifier) {
     console.error('Code verifier not found!');
@@ -81,13 +83,7 @@ export const exchangeCodeForToken = async (code) => {
   }
 
   console.log("You guys have a nice day!")
-  // Log request parameters
-  // console.log('Exchanging code for token with the following parameters:');
-  // console.log('client_id:', clientId);
-  // console.log('grant_type: authorization_code');
-  // console.log('code:', code);
-  // console.log('redirect_uri:', redirectURL);
-  // console.log('code_verifier:', codeVerifier);
+
 
   const response = await fetch('https://accounts.spotify.com/api/token', {
     method: 'POST',
@@ -108,7 +104,7 @@ export const exchangeCodeForToken = async (code) => {
   if (response.ok) {
     const data = await response.json();
     // Save the access and refresh tokens in localStorage
-    // console.log('Access token data:', data);
+    console.log('Access token data:', data);
     localStorage.setItem('accessToken', data.access_token);
     localStorage.setItem('refreshToken', data.refresh_token);
     localStorage.setItem('tokenExpiration', Date.now() + data.expires_in * 1000);
@@ -212,20 +208,31 @@ export const fetchUserPlaylists = async (accessToken) => {
   }
 };
 
-export const fetchUserTopArtists = async (token, timeRange = 'medium_term') => {
-  const response = await fetch(
-    `https://api.spotify.com/v1/me/top/artists?limit=5&time_range=${timeRange}`,
-    {
-      headers: {
-        Authorization: `Bearer ${token}`,
-      },
+export const fetchUserTopArtists = async (token) => {
+  let timeRanges = ['short_term', 'medium_term', 'long_term'];
+  for (let range of timeRanges) {
+    console.log(`Fetching top artists for time range: ${range}`);
+    const response = await fetch(
+      `https://api.spotify.com/v1/me/top/artists?time_range=${range}&limit=5`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+    if (response.ok) {
+      const data = await response.json();
+      console.log(`Received top artists for ${range}:`, data.items);
+      if (data.items && data.items.length > 0) {
+        return data; // Return as soon as we get data
+      }
+    } else {
+      console.error(`Failed to fetch top artists for ${range}:`, await response.json());
     }
-  );
-  if (!response.ok) {
-    throw new Error('Failed to fetch top artists');
   }
-  return response.json();
+  throw new Error('No top artists data available');
 };
+
 
 export const fetchUserRecentlyPlayed = async (token) => {
   const response = await fetch(
