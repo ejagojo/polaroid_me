@@ -1,3 +1,5 @@
+// /src/components/PolaroidCollage.jsx
+
 import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
@@ -65,12 +67,6 @@ const PolaroidCollage = ({
             boxSizing: "border-box",
           }}
         >
-          {/* Background Enhancement */}
-          <div
-            className="absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-300 opacity-10 pointer-events-none"
-            aria-hidden="true"
-          ></div>
-
           {/* Spotify Logo Above the Title */}
           <div className="w-full flex items-center justify-center mb-2 z-10">
             <img
@@ -80,6 +76,11 @@ const PolaroidCollage = ({
               style={{ height: "24px" }}
             />
           </div>
+          {/* Background Enhancement */}
+          <div
+            className="absolute inset-0 bg-gradient-to-b from-gray-100 to-gray-300 opacity-10 pointer-events-none"
+            aria-hidden="true"
+          ></div>
 
           {/* Collage Title */}
           <div className="w-full text-center mb-2 z-10">
@@ -115,7 +116,7 @@ const PolaroidCollage = ({
             className="w-full flex-grow flex flex-wrap justify-center items-start z-10 gap-4"
             style={{ paddingBottom: "40px" }}
           >
-            {tracks.slice(0, 10).map((track) => {
+            {tracks.slice(0, 10).map((track, index) => {
               const rotation = Math.floor(Math.random() * 10) - 5;
               return (
                 <div
@@ -130,10 +131,13 @@ const PolaroidCollage = ({
                   }}
                 >
                   {/* Polaroid Frame */}
-                  <div className="bg-white shadow-lg rounded-lg flex flex-col items-center h-full">
+                  <div
+                    className="bg-white p-2 shadow-lg rounded-lg flex flex-col items-center"
+                    style={{ height: "100%" }}
+                  >
                     {/* Album Art */}
                     <div
-                      className="relative rounded overflow-hidden"
+                      className="relative rounded overflow-hidden mb-2"
                       style={{
                         width: "100%",
                         height: "70%",
@@ -145,13 +149,14 @@ const PolaroidCollage = ({
                         className="w-full h-full object-cover border-2 border-gray-300"
                       />
                     </div>
-
                     {/* Caption */}
                     <div
-                      className="w-full text-center py-1 px-1"
+                      className="absolute bottom-0 w-full bg-white text-center py-1 px-1"
                       style={{
                         height: "40px",
+                        whiteSpace: "nowrap",
                         overflow: "hidden",
+                        textOverflow: "ellipsis",
                         padding: "4px",
                       }}
                     >
@@ -159,9 +164,6 @@ const PolaroidCollage = ({
                         className="font-semibold text-xs text-black leading-tight"
                         style={{
                           fontSize: "8px", // Smaller font size for the track name
-                          whiteSpace: "nowrap",
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
                         }}
                       >
                         {track.name}
@@ -170,9 +172,6 @@ const PolaroidCollage = ({
                         className="text-xs text-gray-500 leading-tight"
                         style={{
                           fontSize: "7px", // Smaller font size for the artist name
-                          whiteSpace: "nowrap",
-                          textOverflow: "ellipsis",
-                          overflow: "hidden",
                         }}
                       >
                         {track.artists[0]?.name}
