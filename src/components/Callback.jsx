@@ -1,5 +1,3 @@
-// /src/components/Callback.jsx
-
 import React, { useEffect, useRef, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { exchangeCodeForToken } from '../services/spotifyService';

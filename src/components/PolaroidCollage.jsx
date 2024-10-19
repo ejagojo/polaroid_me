@@ -1,5 +1,3 @@
-// /src/components/PolaroidCollage.jsx
-
 import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";

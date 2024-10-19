@@ -1,5 +1,3 @@
-// /src/components/LandingPage.jsx
-
 import React from 'react';
 import { Typewriter } from 'react-simple-typewriter';
 import { getSpotifyLoginURL } from '../services/spotifyService';

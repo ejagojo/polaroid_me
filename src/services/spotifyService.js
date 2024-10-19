@@ -1,4 +1,3 @@
-// spotifyService.js
 const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
 const redirectURL = process.env.REACT_APP_SPOTIFY_REDIRECT_URI;
 const scopes = [

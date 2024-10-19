@@ -1,5 +1,3 @@
-// /src/components/PrivacyPolicy.jsx
-
 import React from 'react';
 import Navbar from './Navbar';
 
