@@ -1,47 +1,44 @@
 // /src/components/Callback.jsx
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useContext } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { exchangeCodeForToken } from '../services/spotifyService';
+import { AuthContext } from '../context/AuthContext';
 import Loader from './Loader';
 
 function Callback() {
   const location = useLocation();
   const navigate = useNavigate();
   const hasExchangedCode = useRef(false); // Ref to prevent multiple exchanges
+  const { setAccessToken } = useContext(AuthContext);
 
   useEffect(() => {
     if (hasExchangedCode.current) {
-      console.log("Token exchange has already been done. Skipping...");
       return;
-      }; // If already exchanged, do nothing
-    hasExchangedCode.current = true; // Mark as exchanged
+    }
+    hasExchangedCode.current = true;
 
     const code = new URLSearchParams(location.search).get('code');
-    console.log("Authorization code found in URL:", code);
 
     if (code) {
       exchangeCodeForToken(code)
-        .then(() => {
-          console.log("Token exchange successful, navigating to /home");
-          // Remove code from URL to prevent reuse
+        .then((data) => {
+          setAccessToken(data.access_token);
           navigate('/home', { replace: true });
         })
         .catch((error) => {
           console.error('Error exchanging code for token:', error);
           alert(`Login failed: ${error.message}`);
-          // Clear tokens from localStorage and sessionStorage
-          localStorage.removeItem('accessToken');
-          localStorage.removeItem('refreshToken');
-          localStorage.removeItem('tokenExpiration');
-          sessionStorage.removeItem('pkce_code_verifier');
-          navigate('/'); // Navigate back to login on error
+          // Clear tokens from storage
+          setAccessToken(null);
+          sessionStorage.clear();
+          navigate('/', { replace: true });
         });
     } else {
       console.error('No code found in URL');
-      navigate('/'); // Navigate back to login
+      navigate('/', { replace: true });
     }
-  }, [location, navigate]);
+  }, [location, navigate, setAccessToken]);
 
   return <Loader />; // Display loader while processing
 }

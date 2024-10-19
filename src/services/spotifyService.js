@@ -11,8 +11,8 @@ const scopes = [
   'user-read-recently-played',
 ].join(' '); // Use spaces between scopes
 
-console.log('Client ID:', clientId);
-console.log('Redirect URI:', redirectURL);
+// console.log('Client ID:', clientId);
+// console.log('Redirect URI:', redirectURL);
 
 // Helper function to generate a random string with allowed characters
 const generateRandomString = (length) => {
@@ -23,16 +23,9 @@ const generateRandomString = (length) => {
 };
 
 // Base64 URL-encode an ArrayBuffer
-const base64URLEncode = (buffer) => {
-  const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
-  }
-  return window.btoa(binary)
-    .replace(/\+/g, '-')
-    .replace(/\//g, '_')
-    .replace(/=+$/, '');
+const base64URLEncode = (arrayBuffer) => {
+  let base64 = btoa(String.fromCharCode(...new Uint8Array(arrayBuffer)));
+  return base64.replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
 };
 
 // Generate code challenge from code verifier
@@ -49,11 +42,12 @@ export const getSpotifyLoginURL = async () => {
   const codeChallenge = await generateCodeChallenge(codeVerifier);
 
 
-  console.log('Code Verifier:', codeVerifier);
-  console.log('Code Challenge:', codeChallenge);
+  // console.log('Code Verifier:', codeVerifier);
+  // console.log('Code Challenge:', codeChallenge);
 
-  // Store the code_verifier in localStorage for later use
-  localStorage.setItem('pkce_code_verifier', codeVerifier);
+  // In getSpotifyLoginURL function
+  sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+
 
 
   // Construct the Spotify login URL
@@ -72,10 +66,11 @@ export const getSpotifyLoginURL = async () => {
 
 // Exchange authorization code for an access token using PKCE
 export const exchangeCodeForToken = async (code) => {
-  const codeVerifier = localStorage.getItem('pkce_code_verifier');
-  console.log('Retrieved codeVerifier:', codeVerifier);
-  console.log('Exchanging code:', code);
-  console.log('Using codeVerifier:', codeVerifier)
+  // In exchangeCodeForToken function
+  const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+  // console.log('Retrieved codeVerifier:', codeVerifier);
+  // console.log('Exchanging code:', code);
+  // console.log('Using codeVerifier:', codeVerifier)
 
   if (!codeVerifier) {
     console.error('Code verifier not found!');
@@ -100,14 +95,15 @@ export const exchangeCodeForToken = async (code) => {
   });
 
   console.log('Token exchange response status:', response.status);
-
   if (response.ok) {
     const data = await response.json();
     // Save the access and refresh tokens in localStorage
-    console.log('Access token data:', data);
+    // console.log('Access token data:', data);
     localStorage.setItem('accessToken', data.access_token);
     localStorage.setItem('refreshToken', data.refresh_token);
     localStorage.setItem('tokenExpiration', Date.now() + data.expires_in * 1000);
+    // Clear the code_verifier from storage
+    sessionStorage.removeItem('pkce_code_verifier');
     return data;
   } else {
     const errorData = await response.json();
@@ -222,7 +218,7 @@ export const fetchUserTopArtists = async (token) => {
     );
     if (response.ok) {
       const data = await response.json();
-      console.log(`Received top artists for ${range}:`, data.items);
+      // console.log(`Received top artists for ${range}:`, data.items);
       if (data.items && data.items.length > 0) {
         return data; // Return as soon as we get data
       }

@@ -1,23 +1,22 @@
-// /src/contexts/AuthContext.js
+// /src/context/AuthContext.js
 
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState} from 'react';
 
 export const AuthContext = createContext();
 
 export const AuthProvider = ({ children }) => {
-  const [accessToken, setAccessToken] = useState(localStorage.getItem('accessToken') || null);
+  // Initialize accessToken state with the value from localStorage
+  const [accessToken, setAccessTokenState] = useState(localStorage.getItem('accessToken'));
 
-  useEffect(() => {
-    const handleStorageChange = () => {
-      setAccessToken(localStorage.getItem('accessToken'));
-    };
-
-    // Listen for changes to localStorage
-    window.addEventListener('storage', handleStorageChange);
-
-    // Cleanup listener on unmount
-    return () => window.removeEventListener('storage', handleStorageChange);
-  }, []);
+  // Function to update accessToken in both state and localStorage
+  const setAccessToken = (token) => {
+    setAccessTokenState(token);
+    if (token) {
+      localStorage.setItem('accessToken', token);
+    } else {
+      localStorage.removeItem('accessToken');
+    }
+  };
 
   return (
     <AuthContext.Provider value={{ accessToken, setAccessToken }}>
