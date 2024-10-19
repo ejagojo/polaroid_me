@@ -45,8 +45,9 @@ export const getSpotifyLoginURL = async () => {
   // console.log('Code Verifier:', codeVerifier);
   // console.log('Code Challenge:', codeChallenge);
 
-  // In getSpotifyLoginURL function
-  sessionStorage.setItem('pkce_code_verifier', codeVerifier);
+  // Store code_verifier in localStorage
+  localStorage.setItem('pkce_code_verifier', codeVerifier);
+
 
 
 
@@ -66,8 +67,9 @@ export const getSpotifyLoginURL = async () => {
 
 // Exchange authorization code for an access token using PKCE
 export const exchangeCodeForToken = async (code) => {
-  // In exchangeCodeForToken function
-  const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+  // Retrieve code_verifier from localStorage
+  const codeVerifier = localStorage.getItem('pkce_code_verifier');
+
   // console.log('Retrieved codeVerifier:', codeVerifier);
   // console.log('Exchanging code:', code);
   // console.log('Using codeVerifier:', codeVerifier)
@@ -103,7 +105,7 @@ export const exchangeCodeForToken = async (code) => {
     localStorage.setItem('refreshToken', data.refresh_token);
     localStorage.setItem('tokenExpiration', Date.now() + data.expires_in * 1000);
     // Clear the code_verifier from storage
-    sessionStorage.removeItem('pkce_code_verifier');
+    localStorage.removeItem('pkce_code_verifier');
     return data;
   } else {
     const errorData = await response.json();
@@ -167,7 +169,9 @@ export const fetchSpotifyUserProfile = async (accessToken) => {
   if (response.ok) {
     return response.json();
   } else {
-    throw new Error('Failed to fetch user profile');
+    const errorData = await response.json();
+    console.error('Failed to fetch user profile:', errorData);
+    throw new Error(`Failed to fetch user profile: ${errorData.error.message}`);
   }
 };
 

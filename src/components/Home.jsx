@@ -120,7 +120,6 @@ const Home = () => {
     }
   };
 
-
   return (
     <div className="min-h-screen p-4 bg-black text-white flex justify-center">
       {/* Wrapper with white border */}
@@ -194,16 +193,29 @@ const Home = () => {
           <Loader />
         ) : topTracks.length > 0 ? (
           <div className="mb-8">
-            <h2 className="text-3xl font-bold mb-4">Your Top Tracks - {getTimeRangeDisplay()}</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Your Top Tracks - {getTimeRangeDisplay()}
+            </h2>
             <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-              {topTracks.map((track) => (
+              {topTracks.map((track, index) => (
                 <div
                   key={track.id}
                   className="bg-white p-4 shadow-lg rounded-lg hover:shadow-xl transition-all duration-300 relative flex flex-col items-center"
                   style={{ width: '100%', aspectRatio: '3/4' }} // Slightly taller for a Polaroid look
                 >
+                  {/* Ranking Number */}
+                  <div
+                    className="absolute top-0 left-0 bg-black text-white rounded-br-lg px-2 py-1 z-20"
+                    style={{ fontSize: '12px' }}
+                  >
+                    #{index + 1}
+                  </div>
+
                   {/* Image section with slightly less height to make space for text */}
-                  <div className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2" style={{ width: '100%', height: '70%' }}>
+                  <div
+                    className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2"
+                    style={{ width: '100%', height: '70%' }}
+                  >
                     <img
                       src={track.album.images[0]?.url}
                       alt={track.name}
@@ -259,13 +271,19 @@ const Home = () => {
                   className="bg-white p-4 shadow-lg rounded-lg hover:shadow-xl transition-all duration-300 relative flex flex-col items-center"
                   style={{ width: '100%', aspectRatio: '3/4' }}
                 >
-                  <div className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2" style={{ width: '100%', height: '70%' }}>
+                  {/* Playlist Image */}
+                  <div
+                    className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2"
+                    style={{ width: '100%', height: '70%' }}
+                  >
                     <img
                       src={playlist.images[0]?.url}
                       alt={playlist.name}
                       className="w-full h-full object-cover border-2 border-gray-300"
                     />
                   </div>
+
+                  {/* Playlist Name */}
                   <div className="absolute bottom-0 w-full bg-white text-center py-2 px-2">
                     <p
                       className="font-semibold text-sm text-black leading-tight"
@@ -278,6 +296,8 @@ const Home = () => {
                       {playlist.name}
                     </p>
                   </div>
+
+                  {/* Optional: Add a shadow effect to mimic Polaroid */}
                   <div
                     className="absolute inset-0 border-2 border-gray-300 rounded-lg pointer-events-none"
                     style={{ boxShadow: '0 10px 15px rgba(0, 0, 0, 0.1)' }}

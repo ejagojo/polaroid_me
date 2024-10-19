@@ -1,3 +1,5 @@
+// /src/components/PolaroidCollage.jsx
+
 import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
@@ -73,7 +75,7 @@ const PolaroidCollage = ({
           {/* Collage Title */}
           <div className="w-full text-center mb-2 z-10">
             <h2 className="text-xl font-bold text-black">
-              Top 10 - {userName} - {timeRangeDisplay}
+              Top Tracks - {userName} - {timeRangeDisplay}
             </h2>
           </div>
 
@@ -104,7 +106,7 @@ const PolaroidCollage = ({
             className="w-full flex-grow flex flex-wrap justify-center items-start z-10 gap-4"
             style={{ paddingBottom: "40px" }}
           >
-            {tracks.slice(0, 10).map((track) => {
+            {tracks.slice(0, 10).map((track, index) => {
               const rotation = Math.floor(Math.random() * 10) - 5;
               return (
                 <div
@@ -123,6 +125,14 @@ const PolaroidCollage = ({
                     className="bg-white p-2 shadow-lg rounded-lg flex flex-col items-center"
                     style={{ height: "100%" }}
                   >
+                    {/* Ranking Number */}
+                    <div
+                      className="absolute top-0 left-0 bg-black text-white rounded-br-lg px-2 py-1 z-20"
+                      style={{ fontSize: "12px" }}
+                    >
+                      #{index + 1}
+                    </div>
+
                     {/* Album Art */}
                     <div
                       className="relative rounded overflow-hidden mb-2"
