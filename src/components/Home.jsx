@@ -201,15 +201,7 @@ const Home = () => {
                   className="bg-white p-4 shadow-lg rounded-lg hover:shadow-xl transition-all duration-300 relative flex flex-col items-center"
                   style={{ width: '100%', aspectRatio: '3/4' }} // Slightly taller for a Polaroid look
                 >
-                  {/* Ranking Number */}
-                  <div
-                    className="absolute top-0 left-0 bg-black text-white rounded-br-lg px-2 py-1 z-20"
-                    style={{ fontSize: '12px' }}
-                  >
-                    #{index + 1}
-                  </div>
-
-                  {/* Image section with slightly less height to make space for text */}
+                  {/* Image section */}
                   <div
                     className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2"
                     style={{ width: '100%', height: '70%' }}
@@ -222,7 +214,7 @@ const Home = () => {
                   </div>
 
                   {/* Text section for track name and artist */}
-                  <div className="absolute bottom-0 w-full bg-white text-center py-2 px-2">
+                  <div className="w-full text-center py-2 px-2">
                     <p
                       className="font-semibold text-sm text-black leading-tight"
                       style={{
@@ -243,6 +235,14 @@ const Home = () => {
                     >
                       {track.artists[0]?.name}
                     </p>
+                  </div>
+
+                  {/* Ranking Number - Placed in Bottom Right Corner */}
+                  <div
+                    className="absolute bottom-2 right-2 text-black font-bold text-xs"
+                    style={{ zIndex: 10 }}
+                  >
+                    #{index + 1}
                   </div>
 
                   {/* Optional: Add a shadow effect to mimic Polaroid */}
@@ -282,7 +282,7 @@ const Home = () => {
                   </div>
 
                   {/* Playlist Name */}
-                  <div className="absolute bottom-0 w-full bg-white text-center py-2 px-2">
+                  <div className="w-full text-center py-2 px-2">
                     <p
                       className="font-semibold text-sm text-black leading-tight"
                       style={{
