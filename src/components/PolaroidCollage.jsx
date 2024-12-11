@@ -126,7 +126,7 @@ const PolaroidCollage = ({
 
           {/* Polaroid Frames Container */}
           <div
-            className="w-full flex-grow flex flex-wrap justify-center items-start z-10 gap-4"
+            className="w-full flex-grow flex flex-wrap justify-center items-start z-10 gap-3"
             style={{ paddingBottom: "40px" }}
           >
             {tracks.slice(0, 10).map((track, index) => {
@@ -210,11 +210,10 @@ const PolaroidCollage = ({
               );
             })}
           </div>
-
-          {/* Watermark */}
+{/* 
           <div className="absolute bottom-2 w-full text-center z-10">
             <p className="text-xs text-black">polaroid-me.vercel.app/</p>
-          </div>
+          </div> */}
         </div>
       </div>
 
