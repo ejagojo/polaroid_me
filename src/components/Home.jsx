@@ -197,17 +197,22 @@ const Home = () => {
                 {topTracks.map((track, index) => (
                   <div
                     key={track.id}
-                    className="bg-white p-4 shadow-lg rounded-lg hover:shadow-xl transition-all duration-300 relative flex flex-col items-center"
-                    style={{ width: '100%', aspectRatio: '3/4' }}
+                    className="bg-white p-2 shadow-lg rounded-lg flex flex-col items-center justify-between"
+                    style={{ width: '100%', aspectRatio: '3/4', maxWidth: "320px", position: "relative"}}
                   >
                     <div
-                      className="relative bg-white rounded overflow-hidden flex-shrink-0 mb-2"
-                      style={{ width: '100%', height: '70%' }}
+                      className="relative flex justify-center items-center mb-2"
+                      style={{ width: '100%', height: '70%', overflow: "hidden" }}
                     >
                       <img
                         src={track.album.images[0]?.url}
                         alt={track.name}
-                        className="w-full h-full object-cover border-2 border-gray-300"
+                        className="w-full h-full"
+                        style={{
+                          objectFit: "contain",
+                          // border: "2px solid #ccc",
+                          borderRadius: "0px"
+                        }}
                       />
                     </div>
                     <div className="w-full text-center py-2 px-2">

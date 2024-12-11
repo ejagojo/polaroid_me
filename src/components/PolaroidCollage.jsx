@@ -1,6 +1,4 @@
-// /src/components/PolaroidCollage.jsx
-
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import { saveAs } from "file-saver";
 import SpotifyFullLogo from "../assets/spotify-logo-full.png"; // Import the full Spotify logo
@@ -14,6 +12,29 @@ const PolaroidCollage = ({
 }) => {
   const collageRef = useRef(null);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [gradientBackground, setGradientBackground] = useState("");
+
+  // Function to generate a gradient with three visible layers
+  const generateRandomGradient = () => {
+    const colors = [
+      "#FF5733", // Bright orange
+      "#33FF57", // Bright green
+      "#3357FF", // Bright blue
+      "#FF33A1", // Vibrant pink
+      "#A133FF", // Deep purple
+      "#33FFF6", // Aqua blue
+      "#FFC733", // Bright yellow
+    ];
+    const color1 = colors[Math.floor(Math.random() * colors.length)];
+    const color2 = colors[Math.floor(Math.random() * colors.length)];
+    const color3 = colors[Math.floor(Math.random() * colors.length)];
+    return `linear-gradient(135deg, ${color1} 25%, ${color2} 50%, ${color3} 75%)`;
+  };
+
+  // Set a random gradient background when the component mounts
+  useEffect(() => {
+    setGradientBackground(generateRandomGradient());
+  }, []);
 
   /**
    * Handles the download of the collage image.
@@ -52,7 +73,7 @@ const PolaroidCollage = ({
       <div className="relative w-full flex justify-center mb-4">
         <div
           ref={collageRef}
-          className="relative bg-white border-4 border-gray-800 rounded-lg overflow-hidden"
+          className="relative border-4 border-gray-800 rounded-lg overflow-hidden"
           style={{
             width: "100vw",
             height: "177.78vw", // Aspect ratio for iPhone simulation (16:9)
@@ -65,6 +86,7 @@ const PolaroidCollage = ({
             alignItems: "center",
             padding: "16px",
             boxSizing: "border-box",
+            backgroundImage: gradientBackground, // Apply stronger gradient
           }}
         >
           {/* Spotify Logo Above the Title */}
@@ -84,7 +106,7 @@ const PolaroidCollage = ({
 
           {/* Collage Title */}
           <div className="w-full text-center mb-2 z-10">
-            <h2 className="text-xl font-bold text-black">
+            <h2 className="text-l font-bold text-black">
               Top Tracks - {userName} - {timeRangeDisplay}
             </h2>
           </div>
@@ -94,19 +116,10 @@ const PolaroidCollage = ({
 
           {/* User Statistics */}
           <div className="w-full text-center mb-4 z-10">
-            <p className="text-sm text-black">
+            <p className="text-xs text-black">
               <strong>Favorite Artist:</strong>{" "}
               {topArtists && topArtists.length > 0
                 ? topArtists[0].name
-                : "Not enough data"}
-            </p>
-            <p className="text-sm text-black">
-              <strong>Top Genres:</strong>{" "}
-              {topArtists && topArtists.length > 0
-                ? topArtists
-                    .flatMap((artist) => artist.genres)
-                    .slice(0, 3)
-                    .join(", ") || "N/A"
                 : "Not enough data"}
             </p>
           </div>
@@ -132,21 +145,31 @@ const PolaroidCollage = ({
                 >
                   {/* Polaroid Frame */}
                   <div
-                    className="bg-white p-2 shadow-lg rounded-lg flex flex-col items-center"
-                    style={{ height: "100%" }}
+                    className="bg-white p-2 shadow-lg rounded-lg flex flex-col items-center justify-between"
+                    style={{
+                      height: "100%",
+                      position: "relative",
+                      width: "120px", // Ensuring a consistent width for all Polaroids
+                      aspectRatio: "3 / 4", // Maintain the Polaroid aspect ratio
+                    }}
                   >
                     {/* Album Art */}
                     <div
-                      className="relative rounded overflow-hidden mb-2"
+                      className="relative flex justify-center items-center mb-2"
                       style={{
                         width: "100%",
-                        height: "70%",
+                        height: "70%", // Album art takes up 75% of the Polaroid height
+                        overflow: "hidden", // Prevent overflow of the image
                       }}
                     >
                       <img
                         src={track.album.images[0]?.url}
                         alt={`${track.name} by ${track.artists[0]?.name}`}
-                        className="w-full h-full object-cover border-2 border-gray-300"
+                        className="w-full h-full"
+                        style={{
+                          objectFit: "contain", // Ensures the album art fills the container without stretching
+                          borderRadius: "0px",
+                        }}
                       />
                     </div>
                     {/* Caption */}
@@ -177,7 +200,6 @@ const PolaroidCollage = ({
                         {track.artists[0]?.name}
                       </p>
                     </div>
-
                     {/* Optional: Add a shadow effect to mimic Polaroid */}
                     <div
                       className="absolute inset-0 border-2 border-gray-300 rounded-lg pointer-events-none"
